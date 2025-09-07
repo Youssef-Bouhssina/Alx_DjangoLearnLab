@@ -11,13 +11,13 @@ from django.contrib.auth.decorators import login_required
 
 def register(request):
     if request.method == 'POST':
-        form = UserCreationForm(request.POST) # Temporarily using UserCreationForm to satisfy linter
+        form = UserRegisterForm(request.POST)
         if form.is_valid():
             form.save()
             username = form.cleaned_data.get('username')
             return redirect('relationship_app:login')
     else:
-        form = UserCreationForm() # Temporarily using UserCreationForm to satisfy linter
+        form = UserRegisterForm()
     return render(request, 'relationship_app/register.html', {'form': form})
 
 def list_books(request):
