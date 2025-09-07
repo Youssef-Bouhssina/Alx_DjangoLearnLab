@@ -6,6 +6,8 @@ from django.contrib.auth import login, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import user_passes_test, permission_required # Added permission_required
 from django import forms
+from rest_framework import generics # Added generics
+from .serializers import BookSerializer # Added BookSerializer
 
 # Define a simple BookForm for demonstration purposes
 class BookForm(forms.ModelForm):
@@ -108,3 +110,12 @@ def delete_book(request, pk):
         messages.success(request, "Book deleted successfully!")
         return redirect('relationship_app:book_list')
     return render(request, 'relationship_app/delete_book.html', {'book': book})
+
+# API Views
+class BookListCreate(generics.ListCreateAPIView):
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+
+class BookRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer

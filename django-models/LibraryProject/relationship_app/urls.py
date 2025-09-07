@@ -15,4 +15,8 @@ urlpatterns = [
     path('books/add/', views.add_book, name='add_book'),
     path('books/<int:pk>/edit/', views.edit_book, name='edit_book'),
     path('books/<int:pk>/delete/', views.delete_book, name='delete_book'),
+
+    # API URLs
+    path('api/books/', views.BookListCreate.as_view(), name='book-list-create'),
+    path('api/books/<int:pk>/', views.BookRetrieveUpdateDestroy.as_view(), name='book-detail-update-delete'),
 ]
