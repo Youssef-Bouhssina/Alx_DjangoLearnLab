@@ -1,8 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
-from .models import Book, UserProfile
-from .models import Library
+from .models import Book, Library, UserProfile
 from django.views.generic.detail import DetailView
 from .forms import UserRegisterForm
 from django.contrib.auth.decorators import login_required, user_passes_test
