@@ -4,7 +4,8 @@ from django.contrib.auth.forms import UserCreationForm
 from .models import Book, Library, UserProfile
 from django.views.generic.detail import DetailView
 from .forms import UserRegisterForm, BookForm
-from django.contrib.auth.decorators import login_required, user_passes_test, permission_required
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.decorators import permission_required
 
 # Helper functions for role-based access
 def is_admin(user):
