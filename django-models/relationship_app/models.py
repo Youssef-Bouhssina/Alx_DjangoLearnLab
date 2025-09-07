@@ -1,7 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 
 class Author(models.Model):
     name = models.CharField(max_length=100)
@@ -12,9 +10,7 @@ class Author(models.Model):
 class Book(models.Model):
     title = models.CharField(max_length=200)
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return self.title
+    publication_year = models.IntegerField(default=2000) # Added for library_detail.html template
 
     class Meta:
         permissions = [
@@ -23,8 +19,11 @@ class Book(models.Model):
             ("can_delete_book", "Can delete book"),
         ]
 
+    def __str__(self):
+        return self.title
+
 class Library(models.Model):
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=100)
     books = models.ManyToManyField(Book)
 
     def __str__(self):
@@ -37,6 +36,7 @@ class Librarian(models.Model):
     def __str__(self):
         return self.name
 
+
 class UserProfile(models.Model):
     USER_ROLES = (
         ('Admin', 'Admin'),
@@ -44,7 +44,7 @@ class UserProfile(models.Model):
         ('Member', 'Member'),
     )
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    role = models.CharField(max_length=10, choices=USER_ROLES, default='Member')
+    role = models.CharField(max_length=20, choices=USER_ROLES, default='Member')
 
     def __str__(self):
-        return f"{self.user.username}'s Profile ({self.role})"
+        return f'{self.user.username} - {self.role}'
