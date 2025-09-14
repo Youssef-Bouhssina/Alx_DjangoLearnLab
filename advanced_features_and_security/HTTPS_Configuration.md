@@ -11,6 +11,7 @@ The following security settings have been implemented in `settings.py`:
 ### HTTPS Redirect Configuration
 
 - `SECURE_SSL_REDIRECT = True`: Redirects all HTTP requests to HTTPS
+- `SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')`: Properly handles HTTPS when behind a proxy
 - `SECURE_HSTS_SECONDS = 31536000`: Sets HSTS policy for one year
 - `SECURE_HSTS_INCLUDE_SUBDOMAINS = True`: Includes all subdomains in HSTS policy
 - `SECURE_HSTS_PRELOAD = True`: Allows preloading in browser HSTS lists

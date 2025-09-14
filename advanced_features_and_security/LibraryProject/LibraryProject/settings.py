@@ -151,6 +151,12 @@ LOGOUT_REDIRECT_URL = 'relationship_app:login'
 # Redirect all HTTP requests to HTTPS
 SECURE_SSL_REDIRECT = os.environ.get('DJANGO_SECURE_SSL_REDIRECT', 'True').lower() == 'true'
 
+# Trust the X-Forwarded-Proto header from the proxy
+# This is needed when Django is behind a proxy/load balancer that terminates SSL
+# Only enable this in production when using a properly configured proxy
+if os.environ.get('DJANGO_PROXY_SSL_HEADER', 'False').lower() == 'true':
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 # Enable browser XSS protection
 SECURE_BROWSER_XSS_FILTER = True
 
