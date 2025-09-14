@@ -66,7 +66,11 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django_csp.middleware.CSPMiddleware',  # Add Content Security Policy middleware
+    'accounts',
 ]
+
+# Specify the custom user model
+AUTH_USER_MODEL = 'accounts.CustomUser'
 
 ROOT_URLCONF = 'LibraryProject.urls'
 
