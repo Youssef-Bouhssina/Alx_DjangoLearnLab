@@ -6,6 +6,11 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from django.contrib import messages
 from .models import Book
 from django import forms
+from django.db import models
+import logging
+
+# Set up logger for security auditing
+logger = logging.getLogger(__name__)
 
 # Form for Book model
 class BookForm(forms.ModelForm):
@@ -82,3 +87,27 @@ def edit_book(request, pk):
     book = get_object_or_404(Book, pk=pk)
     # Implementation details would go here
     return render(request, 'bookshelf/edit_book.html', {'book': book})
+
+# Secure search view protected against SQL injection
+@login_required
+def book_search(request):
+    results = None
+    if request.method == 'POST':
+        # Use Django's form validation to sanitize user input
+        query = request.POST.get('query', '')
+
+        # Use Django's ORM which parameterizes queries to prevent SQL injection
+        # Don't use raw SQL with string formatting like:
+        # Book.objects.raw(f"SELECT * FROM bookshelf_book WHERE title LIKE '%{query}%'") - UNSAFE!
+
+        # Instead, use the safe ORM methods:
+        results = Book.objects.filter(
+            models.Q(title__icontains=query) |
+            models.Q(author__icontains=query) |
+            models.Q(publication_year__icontains=query)
+        )
+
+        # Log the search attempt for security auditing
+        logger.info(f"User {request.user.username} searched for: {query}")
+
+    return render(request, 'bookshelf/search.html', {'results': results})

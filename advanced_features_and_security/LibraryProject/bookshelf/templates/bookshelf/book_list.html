@@ -17,8 +17,22 @@
     {% if perms.bookshelf.can_create %}
     <div class="mb-3">
         <a href="{% url 'book_create' %}" class="btn btn-primary">Add New Book</a>
+        <a href="{% url 'book_search' %}" class="btn btn-secondary">Advanced Search</a>
     </div>
     {% endif %}
+
+    <!-- Simple search form with CSRF protection -->
+    <div class="mb-4">
+        <form method="post" action="{% url 'book_search' %}" class="form-inline">
+            {% csrf_token %}
+            <div class="input-group">
+                <input type="text" name="query" class="form-control" placeholder="Quick search...">
+                <div class="input-group-append">
+                    <button type="submit" class="btn btn-outline-secondary">Search</button>
+                </div>
+            </div>
+        </form>
+    </div>
 
     <div class="row">
         {% for book in books %}

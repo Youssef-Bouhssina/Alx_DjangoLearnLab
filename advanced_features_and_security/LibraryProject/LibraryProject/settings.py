@@ -11,6 +11,11 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file, if it exists
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,12 +25,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-8c9axthv+_$8$njrz^l-o7f+8a$gwdv8s$r95buif^tm7^-=sc'
+# Use environment variable or fallback to a default for development
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-8c9axthv+_$8$njrz^l-o7f+8a$gwdv8s$r95buif^tm7^-=sc')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Set DEBUG to False in production environments
+DEBUG = False
 
-ALLOWED_HOSTS = []
+# In production, specify the allowed hosts
+ALLOWED_HOSTS = ['yourdomain.com', 'www.yourdomain.com']
+
+# For development, you can use:
+# DEBUG = True
+# ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -52,6 +64,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django_csp.middleware.CSPMiddleware',  # Add Content Security Policy middleware
 ]
 
 ROOT_URLCONF = 'LibraryProject.urls'
@@ -132,3 +145,42 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_REDIRECT_URL = 'relationship_app:book_list'
 LOGOUT_REDIRECT_URL = 'relationship_app:login'
+
+# Security Settings
+# Enable browser XSS protection
+SECURE_BROWSER_XSS_FILTER = True
+
+# Prevent browsers from MIME-sniffing
+SECURE_CONTENT_TYPE_NOSNIFF = True
+
+# X-Frame-Options helps prevent clickjacking
+# DENY: This page cannot be displayed in a frame
+# SAMEORIGIN: This page can only be displayed in a frame on the same origin
+X_FRAME_OPTIONS = 'DENY'
+
+# Only use cookies over HTTPS
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+
+# Set HttpOnly flag on cookies to prevent JavaScript access
+SESSION_COOKIE_HTTPONLY = True
+CSRF_COOKIE_HTTPONLY = True
+
+# Set Secure Referrer Policy
+SECURE_REFERRER_POLICY = 'same-origin'
+
+# HSTS settings
+SECURE_HSTS_SECONDS = 31536000  # 1 year
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+
+# Content Security Policy settings
+CSP_DEFAULT_SRC = ("'self'",)
+CSP_STYLE_SRC = ("'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net",)
+CSP_SCRIPT_SRC = ("'self'", "https://cdn.jsdelivr.net",)
+CSP_IMG_SRC = ("'self'", "data:",)
+CSP_FONT_SRC = ("'self'", "https://cdn.jsdelivr.net",)
+
+# For development, you might want to comment out or modify some of these settings
+# as they require HTTPS, which might not be set up in development environments.
+# When deploying to production, ensure HTTPS is properly configured.

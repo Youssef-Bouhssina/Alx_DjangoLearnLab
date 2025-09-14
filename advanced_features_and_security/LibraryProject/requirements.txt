@@ -1,0 +1,15 @@
+# Core Django dependencies
+Django==5.2.5
+
+# Security-related packages
+django-csp==3.7
+django-secure==1.0.2
+python-dotenv==1.0.0
+
+# Image processing (for CustomUser profile_photo)
+Pillow==9.5.0
+
+# Environment-specific packages
+# Production-only packages - uncomment for production deployment
+# gunicorn==21.2.0
+# psycopg2-binary==2.9.6  # For PostgreSQL
