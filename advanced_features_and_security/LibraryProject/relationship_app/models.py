@@ -15,10 +15,15 @@ class Book(models.Model):
     publication_year = models.IntegerField(null=True, blank=True)
 
     class Meta:
+        # Custom permissions for the Book model
         permissions = [
             ("can_add_book", "Can add book"),
             ("can_change_book", "Can change book"),
             ("can_delete_book", "Can delete book"),
+            ("can_view_book", "Can view book"),       # Custom permission to view books
+            ("can_create_book", "Can create book"),     # Custom permission to create books
+            ("can_edit_book", "Can edit book"),       # Custom permission to edit books
+            ("can_delete_book_custom", "Can delete book (custom)"), # Custom permission to delete books
         ]
 
     def __str__(self):

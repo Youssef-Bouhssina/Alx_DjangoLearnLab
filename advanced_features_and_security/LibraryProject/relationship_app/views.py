@@ -20,6 +20,7 @@ def is_member(user):
 
 # Create your views here.
 
+# View for user registration
 def register(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST) # Temporarily using UserCreationForm to satisfy linter
@@ -33,7 +34,8 @@ def register(request):
         form = UserCreationForm() # Temporarily using UserCreationForm to satisfy linter
     return render(request, 'relationship_app/register.html', {'form': form})
 
-@permission_required('relationship_app.can_add_book', login_url='/relationship_app/login/')
+# View for adding a new book, requires 'can_create_book' permission
+@permission_required('relationship_app.can_create_book', login_url='/relationship_app/login/')
 @login_required
 def add_book(request):
     if request.method == 'POST':
@@ -45,22 +47,26 @@ def add_book(request):
         form = BookForm()
     return render(request, 'relationship_app/add_book.html', {'form': form})
 
+# Admin dashboard view, accessible only to Admin users
 @login_required
 @user_passes_test(is_admin, login_url='/relationship_app/login/')
 def admin_view(request):
     return render(request, 'relationship_app/admin_view.html')
 
+# Librarian dashboard view, accessible only to Librarian users
 @login_required
 @user_passes_test(is_librarian, login_url='/relationship_app/login/')
 def librarian_view(request):
     return render(request, 'relationship_app/librarian_view.html')
 
+# Member dashboard view, accessible only to Member users
 @login_required
 @user_passes_test(is_member, login_url='/relationship_app/login/')
 def member_view(request):
     return render(request, 'relationship_app/member_view.html')
 
-@permission_required('relationship_app.can_change_book', login_url='/relationship_app/login/')
+# View for editing an existing book, requires 'can_edit_book' permission
+@permission_required('relationship_app.can_edit_book', login_url='/relationship_app/login/')
 @login_required
 def edit_book(request, pk):
     book = get_object_or_404(Book, pk=pk)
@@ -73,7 +79,8 @@ def edit_book(request, pk):
         form = BookForm(instance=book)
     return render(request, 'relationship_app/edit_book.html', {'form': form, 'book': book})
 
-@permission_required('relationship_app.can_delete_book', login_url='/relationship_app/login/')
+# View for deleting a book, requires 'can_delete_book_custom' permission
+@permission_required('relationship_app.can_delete_book_custom', login_url='/relationship_app/login/')
 @login_required
 def delete_book(request, pk):
     book = get_object_or_404(Book, pk=pk)
@@ -82,6 +89,8 @@ def delete_book(request, pk):
         return redirect('relationship_app:book_list')
     return render(request, 'relationship_app/delete_book.html', {'book': book})
 
+# View for listing all books, requires 'can_view_book' permission
+@permission_required('relationship_app.can_view_book', login_url='/relationship_app/login/')
 def list_books(request):
     books = Book.objects.all()
     return render(request, 'relationship_app/list_books.html', {'books': books})
