@@ -8,6 +8,7 @@ from .models import Book
 from django import forms
 from django.db import models
 import logging
+from .forms import ExampleForm
 
 # Set up logger for security auditing
 logger = logging.getLogger(__name__)
@@ -111,3 +112,30 @@ def book_search(request):
         logger.info(f"User {request.user.username} searched for: {query}")
 
     return render(request, 'bookshelf/search.html', {'results': results})
+
+# Example form view with secure form handling
+@login_required
+def example_form_view(request):
+    if request.method == 'POST':
+        # Create a form instance with POST data
+        form = ExampleForm(request.POST)
+
+        # Check if the form is valid - this automatically sanitizes inputs
+        if form.is_valid():
+            # Process the data - secure handling because data is validated
+            name = form.cleaned_data['name']
+            email = form.cleaned_data['email']  # Email already validated in form.clean_email
+            message = form.cleaned_data['message']
+
+            # Log form submission for security auditing
+            logger.info(f"User {request.user.username} submitted form with name: {name}")
+
+            # Redirect to success page with a success message
+            messages.success(request, 'Form submitted successfully!')
+            return redirect('book_list')
+    else:
+        # Create a new form instance for GET request
+        form = ExampleForm()
+
+    # Render the form template
+    return render(request, 'bookshelf/form_example.html', {'form': form})
