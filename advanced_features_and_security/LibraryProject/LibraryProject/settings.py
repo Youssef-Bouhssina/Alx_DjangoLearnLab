@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'bookshelf',
 ]
 
+# Specify the custom user model
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
 MIDDLEWARE = [
