@@ -30,10 +30,10 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-8c9axthv+_$8$n
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # Set DEBUG to False in production environments
-DEBUG = False
+DEBUG = os.environ.get('DJANGO_DEBUG', 'False').lower() == 'true'
 
 # In production, specify the allowed hosts
-ALLOWED_HOSTS = ['yourdomain.com', 'www.yourdomain.com']
+ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', 'yourdomain.com,www.yourdomain.com').split(',')
 
 # For development, you can use:
 # DEBUG = True
@@ -147,6 +147,10 @@ LOGIN_REDIRECT_URL = 'relationship_app:book_list'
 LOGOUT_REDIRECT_URL = 'relationship_app:login'
 
 # Security Settings
+# HTTPS Configuration
+# Redirect all HTTP requests to HTTPS
+SECURE_SSL_REDIRECT = os.environ.get('DJANGO_SECURE_SSL_REDIRECT', 'True').lower() == 'true'
+
 # Enable browser XSS protection
 SECURE_BROWSER_XSS_FILTER = True
 
@@ -159,20 +163,23 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = 'DENY'
 
 # Only use cookies over HTTPS
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+# Ensures that cookies are only sent over secure connections
+SESSION_COOKIE_SECURE = os.environ.get('DJANGO_SESSION_COOKIE_SECURE', 'True').lower() == 'true'
+CSRF_COOKIE_SECURE = os.environ.get('DJANGO_CSRF_COOKIE_SECURE', 'True').lower() == 'true'
 
 # Set HttpOnly flag on cookies to prevent JavaScript access
+# This helps protect against XSS attacks
 SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_HTTPONLY = True
 
 # Set Secure Referrer Policy
 SECURE_REFERRER_POLICY = 'same-origin'
 
-# HSTS settings
-SECURE_HSTS_SECONDS = 31536000  # 1 year
-SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-SECURE_HSTS_PRELOAD = True
+# HTTP Strict Transport Security (HSTS) settings
+# HSTS instructs browsers to only access the site via HTTPS
+SECURE_HSTS_SECONDS = 31536000  # 1 year - browsers will remember HTTPS setting for this duration
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True  # Apply HSTS to all subdomains
+SECURE_HSTS_PRELOAD = True  # Allow preloading in browser HSTS lists
 
 # Content Security Policy settings
 CSP_DEFAULT_SRC = ("'self'",)
