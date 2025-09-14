@@ -10,4 +10,8 @@ urlpatterns = [
     path('<int:pk>/edit/', views.edit_book, name='edit_book'),
     path('search/', views.book_search, name='book_search'),
     path('example-form/', views.example_form_view, name='example_form'),
+    # User-related URLs
+    path('profile/', views.profile_view, name='profile'),
+    path('profile/edit/', views.edit_profile, name='edit_profile'),
+    path('signup/', views.signup, name='signup'),
 ]
