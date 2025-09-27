@@ -51,7 +51,7 @@ class BookAPITests(APITestCase):
         """
         Ensure authenticated users can create a new book.
         """
-        self.client.force_authenticate(user=self.user)
+        self.client.login(username='testuser', password='testpassword')
         url = reverse('book-create')
         data = {'title': 'New Book', 'author': self.author.id, 'publication_year': 2024}
         response = self.client.post(url, data, format='json')
@@ -62,7 +62,7 @@ class BookAPITests(APITestCase):
         """
         Ensure authenticated users can update a book.
         """
-        self.client.force_authenticate(user=self.user)
+        self.client.login(username='testuser', password='testpassword')
         url = reverse('book-update', args=[self.book1.id])
         data = {'title': 'Updated Book A', 'author': self.author.id, 'publication_year': 2022}
         response = self.client.put(url, data, format='json')
@@ -74,7 +74,7 @@ class BookAPITests(APITestCase):
         """
         Ensure authenticated users can delete a book.
         """
-        self.client.force_authenticate(user=self.user)
+        self.client.login(username='testuser', password='testpassword')
         url = reverse('book-delete', args=[self.book1.id])
         response = self.client.delete(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
