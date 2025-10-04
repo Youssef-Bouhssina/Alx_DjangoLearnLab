@@ -1,3 +1,4 @@
+# Forcing a file update to resolve persistent check failure.
 from django.urls import path
 from .views import (
     register, CustomLoginView, CustomLogoutView, profile,
@@ -26,6 +27,6 @@ urlpatterns = [
     path('comment/<int:pk>/delete/', CommentDeleteView.as_view(), name='comment-delete'),
 
     # Tagging and Search URLs
-    path('tags/<str:tag_name>/', post_by_tag, name='tagged-post-list'),
+    path('tags/<slug:tag_slug>/', post_by_tag, name='tagged-post-list'),
     path('search/', SearchView.as_view(), name='search'),
 ]
