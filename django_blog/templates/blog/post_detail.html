@@ -4,6 +4,14 @@
   <article>
     <h2>{{ object.title }}</h2>
     <p><small>By {{ object.author.username }} on {{ object.published_date|date:"F d, Y" }}</small></p>
+    
+    <div class="tags">
+      Tags:
+      {% for tag in object.tags.all %}
+        <a href="{% url 'tagged-post-list' tag.slug %}">{{ tag.name }}</a>{% if not forloop.last %}, {% endif %}
+      {% endfor %}
+    </div>
+
     <p>{{ object.content|linebreaksbr }}</p>
 
     {% if user == object.author %}
@@ -35,7 +43,7 @@
 
   <section id="add-comment">
     {% if user.is_authenticated %}
-      <a href="{% url 'comment-create' post.pk %}">Add a Comment</a>
+      <a href="{% url 'comment-create' object.pk %}">Add a Comment</a>
     {% else %}
       <p>You must be <a href="{% url 'login' %}?next={{ request.path }}">logged in</a> to post a comment.</p>
     {% endif %}

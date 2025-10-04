@@ -8,7 +8,13 @@
 </head>
 <body>
     <header>
-        <h1><a href="/">Django Blog</a></h1>
+        <h1><a href="{% url 'post-list' %}">Django Blog</a></h1>
+        <div class="search-bar">
+            <form action="{% url 'search' %}" method="get">
+                <input type="text" name="q" placeholder="Search posts...">
+                <button type="submit">Search</button>
+            </form>
+        </div>
     </header>
     <main>
         {% block content %}

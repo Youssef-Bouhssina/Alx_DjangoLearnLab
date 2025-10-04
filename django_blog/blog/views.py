@@ -7,6 +7,8 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from .forms import CustomUserCreationForm, CustomUserChangeForm, PostForm, CommentForm
 from .models import Post, Comment
 from django.urls import reverse_lazy, reverse
+from django.db.models import Q
+from taggit.models import Tag
 
 # --- Authentication Views ---
 
@@ -155,3 +157,45 @@ class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
     def get_success_url(self):
         return reverse('post-detail', kwargs={'pk': self.object.post.pk})
+
+# --- Tagging and Search Views ---
+
+class TaggedPostListView(ListView):
+    """
+    Displays a list of posts filtered by a specific tag.
+    """
+    model = Post
+    template_name = 'blog/post_list.html'
+    context_object_name = 'posts'
+
+    def get_queryset(self):
+        tag_slug = self.kwargs.get('tag_slug')
+        tag = get_object_or_404(Tag, slug=tag_slug)
+        return Post.objects.filter(tags__in=[tag])
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['tag'] = get_object_or_404(Tag, slug=self.kwargs.get('tag_slug'))
+        return context
+
+class SearchView(ListView):
+    """
+    Displays search results based on a query.
+    Searches post titles and content.
+    """
+    model = Post
+    template_name = 'blog/search_results.html'
+    context_object_name = 'posts'
+
+    def get_queryset(self):
+        query = self.request.GET.get('q')
+        if query:
+            return Post.objects.filter(
+                Q(title__icontains=query) | Q(content__icontains=query)
+            ).distinct()
+        return Post.objects.none()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['query'] = self.request.GET.get('q', '')
+        return context

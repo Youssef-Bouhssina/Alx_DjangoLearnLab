@@ -1,8 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <h2>{% if tag %}Posts tagged with "{{ tag.name }}"{% else %}All Posts{% endif %}</h2>
-  <a href="{% url 'post-create' %}">Create New Post</a>
+  <h2>Search Results for "{{ query }}"</h2>
   <hr>
   {% for post in posts %}
     <article>
@@ -17,5 +16,7 @@
       <small>By {{ post.author.username }} on {{ post.published_date|date:"F d, Y" }}</small>
     </article>
     <hr>
+  {% empty %}
+    <p>No posts found matching your search query.</p>
   {% endfor %}
 {% endblock %}
