@@ -160,23 +160,17 @@ class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
 # --- Tagging and Search Views ---
 
-class TaggedPostListView(ListView):
+def post_by_tag(request, tag_slug):
     """
     Displays a list of posts filtered by a specific tag.
     """
-    model = Post
-    template_name = 'blog/post_list.html'
-    context_object_name = 'posts'
-
-    def get_queryset(self):
-        tag_slug = self.kwargs.get('tag_slug')
-        tag = get_object_or_404(Tag, slug=tag_slug)
-        return Post.objects.filter(tags__in=[tag])
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['tag'] = get_object_or_404(Tag, slug=self.kwargs.get('tag_slug'))
-        return context
+    tag = get_object_or_404(Tag, slug=tag_slug)
+    posts = Post.objects.filter(tags__in=[tag])
+    context = {
+        'tag': tag,
+        'posts': posts
+    }
+    return render(request, 'blog/post_list.html', context)
 
 class SearchView(ListView):
     """
