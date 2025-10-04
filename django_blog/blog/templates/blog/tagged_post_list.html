@@ -1,7 +1,7 @@
 {% extends 'blog/base.html' %}
 
 {% block content %}
-    <h2>Posts tagged with "{{ view.kwargs.tag }}"</h2>
+    <h2>Posts tagged with "{{ view.kwargs.tag_slug }}"</h2>
     {% for post in posts %}
         <article>
             <h2><a href="{% url 'post-detail' post.id %}">{{ post.title }}</a></h2>
