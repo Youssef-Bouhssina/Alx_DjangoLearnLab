@@ -17,8 +17,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'blog',      # Task 0
-    'crispy_forms',
-    'crispy_bootstrap5',
+    'taggit',    # Task 4
 ]
 
 MIDDLEWARE = [
@@ -54,8 +53,12 @@ WSGI_APPLICATION = 'django_blog.wsgi.application'
 # Task 0: Database Configuration with required keys
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'blog_db',
+        'USER': 'blog_user',
+        'PASSWORD': 'password',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
@@ -75,6 +78,3 @@ STATIC_URL = 'static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
-CRISPY_TEMPLATE_PACK = "bootstrap5"
