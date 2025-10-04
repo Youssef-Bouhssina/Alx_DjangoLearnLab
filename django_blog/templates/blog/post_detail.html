@@ -1,58 +1,50 @@
 {% extends 'base.html' %}
+{% load crispy_forms_tags %}
 
 {% block content %}
-  <article>
-    <h2>{{ object.title }}</h2>
-    <p><small>By {{ object.author.username }} on {{ object.published_date|date:"F d, Y" }}</small></p>
-    
-    <div class="tags">
-      Tags:
-      {% for tag in object.tags.all %}
-        <a href="{% url 'tagged-post-list' tag.name %}">{{ tag.name }}</a>{% if not forloop.last %}, {% endif %}
-      {% endfor %}
-    </div>
+    <article class="media content-section">
+        <div class="media-body">
+            <div class="article-metadata">
+                <a class="mr-2" href="#">{{ post.author }}</a>
+                <small class="text-muted">{{ post.published_date|date:"F d, Y" }}</small>
+                {% if user.is_authenticated and user == post.author %}
+                    <div>
+                        <a class="btn btn-secondary btn-sm mt-1 mb-1" href="{% url 'blog:post_edit' post.pk %}">Update</a>
+                        <a class="btn btn-danger btn-sm mt-1 mb-1" href="{% url 'blog:post_delete' post.pk %}">Delete</a>
+                    </div>
+                {% endif %}
+            </div>
+            <h2 class="article-title">{{ post.title }}</h2>
+            <p class="article-content">{{ post.content }}</p>
+        </div>
+    </article>
 
-    <p>{{ object.content|linebreaksbr }}</p>
+    <div class="content-section">
+        <h3>Comments</h3>
+        {% for comment in post.comments.all %}
+            <div class="media mb-3">
+                <div class="media-body">
+                    <h5 class="mt-0">{{ comment.author.username }} <small class="text-muted">- {{ comment.created_at|date:"F d, Y H:i" }}</small></h5>
+                    <p>{{ comment.content }}</p>
+                    {% if user.is_authenticated and user == comment.author %}
+                        <a class="btn btn-danger btn-sm" href="{% url 'blog:comment_delete' comment.pk %}">Delete Comment</a>
+                    {% endif %}
+                </div>
+            </div>
+        {% empty %}
+            <p>No comments yet.</p>
+        {% endfor %}
 
-    {% if user == object.author %}
-      <a href="{% url 'post-update' object.pk %}">Edit Post</a>
-      <a href="{% url 'post-delete' object.pk %}">Delete Post</a>
-    {% endif %}
-  </article>
-  <hr>
-
-  <section id="comments">
-    <h3>Comments</h3>
-    {% for comment in object.comments.all %}
-      <div class="comment">
-        <p>
-          <strong>{{ comment.author.username }}</strong>
-          <small>on {{ comment.created_at|date:"F d, Y" }}</small>
-        </p>
-        <p>{{ comment.content|linebreaksbr }}</p>
-        {% if user == comment.author %}
-          <a href="{% url 'comment-update' comment.pk %}">Edit Comment</a>
-          <a href="{% url 'comment-delete' comment.pk %}">Delete Comment</a>
+        {% if user.is_authenticated %}
+            <hr>
+            <h4>Add a comment</h4>
+            <form method="post" class="comment-form">
+                {% csrf_token %}
+                {{ comment_form|crispy }}
+                <button type="submit" class="btn btn-primary mt-2">Submit Comment</button>
+            </form>
+        {% else %}
+            <p><a href="{% url 'blog:login' %}">Log in</a> to leave a comment.</p>
         {% endif %}
-      </div>
-      <hr>
-    {% empty %}
-      <p>No comments yet. Be the first to comment!</p>
-    {% endfor %}
-  </section>
-
-  <section id="add-comment">
-    <h3>Add a Comment</h3>
-    {% if user.is_authenticated %}
-      <form method="post">
-        {% csrf_token %}
-        {{ comment_form.as_p }}
-        <button type="submit">Submit</button>
-      </form>
-    {% else %}
-      <p>You must be <a href="{% url 'login' %}?next={{ request.path }}">logged in</a> to post a comment.</p>
-    {% endif %}
-  </section>
-
-  <a href="{% url 'post-list' %}">Back to all posts</a>
+    </div>
 {% endblock %}

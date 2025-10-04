@@ -1,10 +1,18 @@
 {% extends 'base.html' %}
+{% load crispy_forms_tags %}
 
 {% block content %}
-  <h2>{% if object %}Edit Post{% else %}Create New Post{% endif %}</h2>
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">{% if object %}Update Post{% else %}Create Post{% endif %}</button>
-  </form>
+<div class="content-section">
+    <form method="POST">
+        {% csrf_token %}
+        <fieldset class="form-group">
+            <legend class="border-bottom mb-4">{{ view.model|default:"Post" }} Form</legend>
+            {{ form|crispy }}
+        </fieldset>
+        <div class="form-group">
+            <button class="btn btn-outline-info" type="submit">Save</button>
+            <a class="btn btn-outline-secondary" href="{% url 'blog:post_list' %}">Cancel</a>
+        </div>
+    </form>
+</div>
 {% endblock %}
