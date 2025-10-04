@@ -6,7 +6,7 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from django.urls import reverse_lazy
 from django.db.models import Q
 from taggit.models import Tag
-from .forms import CustomUserCreationForm, CommentForm
+from .forms import CustomUserCreationForm, CommentForm, PostForm
 from .models import Post, Comment
 
 def post_list(request):
@@ -43,7 +43,7 @@ class PostDetailView(DetailView):
 
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
-    fields = ['title', 'content', 'tags']
+    form_class = PostForm
 
     def form_valid(self, form):
         form.instance.author = self.request.user
@@ -51,7 +51,7 @@ class PostCreateView(LoginRequiredMixin, CreateView):
 
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Post
-    fields = ['title', 'content', 'tags']
+    form_class = PostForm
 
     def form_valid(self, form):
         form.instance.author = self.request.user
