@@ -1,4 +1,4 @@
-# Final, definitive forms for the django_blog project.
+# Definitive Overhaul: forms.py
 
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm

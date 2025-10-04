@@ -1,4 +1,4 @@
-# Final, definitive settings for the django_blog project.
+# Definitive Overhaul: settings.py
 
 from pathlib import Path
 import os

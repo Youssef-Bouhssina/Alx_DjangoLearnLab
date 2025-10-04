@@ -1,4 +1,4 @@
-# Final, definitive models for the django_blog project.
+# Definitive Overhaul: models.py
 
 from django.db import models
 from django.contrib.auth.models import User
