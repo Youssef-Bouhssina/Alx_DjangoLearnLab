@@ -160,11 +160,11 @@ class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
 # --- Tagging and Search Views ---
 
-def post_by_tag(request, tag_slug):
+def post_by_tag(request, tag_name):
     """
-    Displays a list of posts filtered by a specific tag.
+    Displays a list of posts filtered by a specific tag name.
     """
-    tag = get_object_or_404(Tag, slug=tag_slug)
+    tag = get_object_or_404(Tag, name=tag_name)
     posts = Post.objects.filter(tags__in=[tag])
     context = {
         'tag': tag,
