@@ -1,15 +1,18 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.views import LoginView, LogoutView
-from .forms import CustomUserCreationForm, CustomUserChangeForm
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from .forms import CustomUserCreationForm, CustomUserChangeForm, PostForm
+from .models import Post
 from django.urls import reverse_lazy
+
+# --- Authentication Views ---
 
 def register(request):
     """
-    Handles user registration. If the request method is POST and the form is valid,
-    it saves the new user and logs them in before redirecting to the profile page.
-    Otherwise, it displays an empty registration form.
+    Handles user registration.
     """
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
@@ -25,8 +28,6 @@ def register(request):
 def profile(request):
     """
     Allows an authenticated user to view and update their profile.
-    If the request method is POST and the form is valid, it updates the user's
-    information. Otherwise, it displays the current user's information in a form.
     """
     if request.method == 'POST':
         form = CustomUserChangeForm(request.POST, instance=request.user)
@@ -39,8 +40,7 @@ def profile(request):
 
 class CustomLoginView(LoginView):
     """
-    Custom login view that uses a specific template.
-    Redirects to the profile page upon successful login.
+    Custom login view.
     """
     template_name = 'registration/login.html'
     redirect_authenticated_user = True
@@ -48,6 +48,63 @@ class CustomLoginView(LoginView):
 
 class CustomLogoutView(LogoutView):
     """
-    Custom logout view that redirects to the login page after logout.
+    Custom logout view.
     """
     next_page = reverse_lazy('login')
+
+# --- Blog Post CRUD Views ---
+
+class PostListView(ListView):
+    """
+    Displays a list of all blog posts. Accessible to all users.
+    """
+    model = Post
+    template_name = 'blog/post_list.html'
+    context_object_name = 'posts'
+    ordering = ['-published_date']
+
+class PostDetailView(DetailView):
+    """
+    Displays a single blog post. Accessible to all users.
+    """
+    model = Post
+    template_name = 'blog/post_detail.html'
+
+class PostCreateView(LoginRequiredMixin, CreateView):
+    """
+    Allows authenticated users to create a new blog post.
+    The author is automatically set to the current user.
+    """
+    model = Post
+    form_class = PostForm
+    template_name = 'blog/post_form.html'
+    success_url = reverse_lazy('post-list')
+
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        return super().form_valid(form)
+
+class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    """
+    Allows the author of a post to update it.
+    """
+    model = Post
+    form_class = PostForm
+    template_name = 'blog/post_form.html'
+    success_url = reverse_lazy('post-list')
+
+    def test_func(self):
+        post = self.get_object()
+        return self.request.user == post.author
+
+class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    """
+    Allows the author of a post to delete it.
+    """
+    model = Post
+    template_name = 'blog/post_confirm_delete.html'
+    success_url = reverse_lazy('post-list')
+
+    def test_func(self):
+        post = self.get_object()
+        return self.request.user == post.author

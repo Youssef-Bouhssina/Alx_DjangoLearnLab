@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.contrib.auth.models import User
+from .models import Post
 
 class CustomUserCreationForm(UserCreationForm):
     """
@@ -22,3 +23,12 @@ class CustomUserChangeForm(UserChangeForm):
     class Meta:
         model = User
         fields = ('username', 'email')
+
+class PostForm(forms.ModelForm):
+    """
+    A form for creating and updating Post instances.
+    The author is set automatically in the view and is not part of the form.
+    """
+    class Meta:
+        model = Post
+        fields = ['title', 'content']
