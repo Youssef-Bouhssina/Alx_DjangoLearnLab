@@ -1,32 +1,40 @@
-# Forcing a file update to resolve persistent check failure.
+# Final, definitive URL configuration for the django_blog project.
+
 from django.urls import path
 from .views import (
+    # Task 1: Authentication
     register, CustomLoginView, CustomLogoutView, profile,
+    
+    # Task 2: Post CRUD
     PostListView, PostDetailView, PostCreateView, PostUpdateView, PostDeleteView,
-    CommentCreateView, CommentUpdateView, CommentDeleteView,
+    
+    # Task 3: Comment CRUD
+    CommentUpdateView, CommentDeleteView,
+    
+    # Task 4: Tagging and Search
     post_by_tag, SearchView
 )
 
 urlpatterns = [
-    # Authentication URLs
+    # --- Authentication URLs (Task 1) ---
     path('register/', register, name='register'),
     path('login/', CustomLoginView.as_view(), name='login'),
     path('logout/', CustomLogoutView.as_view(), name='logout'),
     path('profile/', profile, name='profile'),
 
-    # Blog Post CRUD URLs
-    path('', PostListView.as_view(), name='post-list'),
-    path('post/<int:pk>/', PostDetailView.as_view(), name='post-detail'),
-    path('post/new/', PostCreateView.as_view(), name='post-create'),
-    path('post/<int:pk>/update/', PostUpdateView.as_view(), name='post-update'),
-    path('post/<int:pk>/delete/', PostDeleteView.as_view(), name='post-delete'),
+    # --- Blog Post CRUD URLs (Task 2) ---
+    path('posts/', PostListView.as_view(), name='post-list'),
+    path('posts/new/', PostCreateView.as_view(), name='post-create'),
+    path('posts/<int:pk>/', PostDetailView.as_view(), name='post-detail'),
+    path('posts/<int:pk>/edit/', PostUpdateView.as_view(), name='post-update'),
+    path('posts/<int:pk>/delete/', PostDeleteView.as_view(), name='post-delete'),
 
-    # Comment CRUD URLs
-    path('post/<int:pk>/comments/new/', CommentCreateView.as_view(), name='comment-create'),
+    # --- Comment CRUD URLs (Task 3) ---
+    # Note: Comment creation is handled by PostDetailView, so no 'new' URL is needed here.
     path('comment/<int:pk>/update/', CommentUpdateView.as_view(), name='comment-update'),
     path('comment/<int:pk>/delete/', CommentDeleteView.as_view(), name='comment-delete'),
 
-    # Tagging and Search URLs
-    path('tags/<slug:tag_slug>/', post_by_tag, name='tagged-post-list'),
+    # --- Tagging and Search URLs (Task 4) ---
+    path('tags/<str:tag_name>/', post_by_tag, name='tagged-post-list'),
     path('search/', SearchView.as_view(), name='search'),
 ]

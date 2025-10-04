@@ -1,10 +1,12 @@
+# Final, definitive models for the django_blog project.
+
 from django.db import models
 from django.contrib.auth.models import User
 from taggit.managers import TaggableManager
 
 class Post(models.Model):
     """
-    Represents a blog post.
+    Represents a blog post, with tagging enabled (Task 0 & 4).
     """
     title = models.CharField(max_length=200)
     content = models.TextField()
@@ -17,7 +19,7 @@ class Post(models.Model):
 
 class Comment(models.Model):
     """
-    Represents a comment on a blog post.
+    Represents a comment on a blog post (Task 3).
     """
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
     author = models.ForeignKey(User, on_delete=models.CASCADE)

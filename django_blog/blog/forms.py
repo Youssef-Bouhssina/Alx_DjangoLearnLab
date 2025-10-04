@@ -1,3 +1,5 @@
+# Final, definitive forms for the django_blog project.
+
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.contrib.auth.models import User
@@ -6,7 +8,7 @@ from taggit.forms import TagWidget
 
 class CustomUserCreationForm(UserCreationForm):
     """
-    A custom user creation form that includes the email field.
+    A custom user creation form that includes the email field (Task 1).
     """
     email = forms.EmailField(required=True)
 
@@ -16,10 +18,9 @@ class CustomUserCreationForm(UserCreationForm):
 
 class CustomUserChangeForm(UserChangeForm):
     """
-    A custom form for updating user profile information.
-    Allows users to update their username and email.
+    A custom form for updating user profile information (Task 1).
     """
-    password = None  # Exclude the password field
+    password = None
 
     class Meta:
         model = User
@@ -27,8 +28,7 @@ class CustomUserChangeForm(UserChangeForm):
 
 class PostForm(forms.ModelForm):
     """
-    A form for creating and updating Post instances.
-    The author is set automatically in the view and is not part of the form.
+    A form for creating and updating Post instances, with an explicit TagWidget (Task 2 & 4).
     """
     class Meta:
         model = Post
@@ -39,7 +39,7 @@ class PostForm(forms.ModelForm):
 
 class CommentForm(forms.ModelForm):
     """
-    A form for creating and updating comments.
+    A form for creating and updating comments (Task 3).
     """
     class Meta:
         model = Comment
