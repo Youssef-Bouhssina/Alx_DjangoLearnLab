@@ -1,12 +1,13 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.views import LoginView, LogoutView
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from .forms import CustomUserCreationForm, CustomUserChangeForm, PostForm
-from .models import Post
-from django.urls import reverse_lazy
+from django.views.generic.edit import FormMixin
+from .forms import CustomUserCreationForm, CustomUserChangeForm, PostForm, CommentForm
+from .models import Post, Comment
+from django.urls import reverse_lazy, reverse
 
 # --- Authentication Views ---
 
@@ -63,17 +64,43 @@ class PostListView(ListView):
     context_object_name = 'posts'
     ordering = ['-published_date']
 
-class PostDetailView(DetailView):
+class PostDetailView(FormMixin, DetailView):
     """
-    Displays a single blog post. Accessible to all users.
+    Displays a single blog post and its comments. 
+    Handles new comment submission for authenticated users.
     """
     model = Post
     template_name = 'blog/post_detail.html'
+    form_class = CommentForm
+
+    def get_success_url(self):
+        return reverse('post-detail', kwargs={'pk': self.object.pk})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['comment_form'] = self.get_form()
+        return context
+
+    def post(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect('login')
+        self.object = self.get_object()
+        form = self.get_form()
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+    def form_valid(self, form):
+        comment = form.save(commit=False)
+        comment.post = self.object
+        comment.author = self.request.user
+        comment.save()
+        return super().form_valid(form)
 
 class PostCreateView(LoginRequiredMixin, CreateView):
     """
     Allows authenticated users to create a new blog post.
-    The author is automatically set to the current user.
     """
     model = Post
     form_class = PostForm
@@ -108,3 +135,34 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def test_func(self):
         post = self.get_object()
         return self.request.user == post.author
+
+# --- Comment CRUD Views ---
+
+class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    """
+    Allows the author of a comment to update it.
+    """
+    model = Comment
+    form_class = CommentForm
+    template_name = 'blog/comment_form.html'
+
+    def test_func(self):
+        comment = self.get_object()
+        return self.request.user == comment.author
+
+    def get_success_url(self):
+        return reverse('post-detail', kwargs={'pk': self.object.post.pk})
+
+class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    """
+    Allows the author of a comment to delete it.
+    """
+    model = Comment
+    template_name = 'blog/comment_confirm_delete.html'
+
+    def test_func(self):
+        comment = self.get_object()
+        return self.request.user == comment.author
+
+    def get_success_url(self):
+        return reverse('post-detail', kwargs={'pk': self.object.post.pk})
