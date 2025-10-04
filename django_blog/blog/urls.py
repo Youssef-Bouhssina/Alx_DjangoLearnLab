@@ -1,35 +1,32 @@
-# Final, definitive, and absolutely correct URL configuration based on check requirements.
-
 from django.urls import path
 from .views import (
-    register, CustomLoginView, CustomLogoutView, profile,
-    PostListView, PostDetailView, PostCreateView, PostUpdateView, PostDeleteView,
-    CommentUpdateView, CommentDeleteView,
-    post_by_tag, SearchView
+    PostListView,
+    PostDetailView,
+    PostCreateView,
+    PostUpdateView,
+    PostDeleteView,
+    CommentCreateView,
+    CommentUpdateView,
+    CommentDeleteView,
+    TaggedPostListView,
+    SearchResultsView
 )
+from . import views
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
-    # --- Authentication URLs (Task 1) ---
-    path('register/', register, name='register'),
-    path('login/', CustomLoginView.as_view(), name='login'),
-    path('logout/', CustomLogoutView.as_view(), name='logout'),
-    path('profile/', profile, name='profile'),
-
-    # --- Blog Post CRUD URLs (Task 2) ---
-    # Using singular 'post/' and 'update' to satisfy the checks.
-    path('', PostListView.as_view(), name='post-list'),
-    path('post/new/', PostCreateView.as_view(), name='post-create'),
+    path('', PostListView.as_view(), name='post_list'),
     path('post/<int:pk>/', PostDetailView.as_view(), name='post-detail'),
+    path('post/new/', PostCreateView.as_view(), name='post-create'),
     path('post/<int:pk>/update/', PostUpdateView.as_view(), name='post-update'),
     path('post/<int:pk>/delete/', PostDeleteView.as_view(), name='post-delete'),
-
-    # --- Comment CRUD URLs (Task 3) ---
-    # Note: Comment creation is handled by PostDetailView
+    path('post/<int:pk>/comment/', CommentCreateView.as_view(), name='comment-create'),
     path('comment/<int:pk>/update/', CommentUpdateView.as_view(), name='comment-update'),
     path('comment/<int:pk>/delete/', CommentDeleteView.as_view(), name='comment-delete'),
-
-    # --- Tagging and Search URLs (Task 4) ---
-    # Using a function-based view to satisfy the negative check for PostByTagListView.as_view()
-    path('tags/<str:tag_name>/', post_by_tag, name='tagged-post-list'),
-    path('search/', SearchView.as_view(), name='search'),
+    path('tag/<str:tag>/', TaggedPostListView.as_view(), name='tagged'),
+    path('search/', SearchResultsView.as_view(), name='search_results'),
+    path('login/', auth_views.LoginView.as_view(template_name='blog/login.html'), name='login'),
+    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
+    path('register/', views.register, name='register'),
+    path('profile/', views.profile, name='profile'),
 ]
