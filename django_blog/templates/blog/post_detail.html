@@ -29,18 +29,13 @@
       </div>
       <hr>
     {% empty %}
-      <p>No comments yet. Be the first to comment!</p>
+      <p>No comments yet.</p>
     {% endfor %}
   </section>
 
   <section id="add-comment">
-    <h3>Add a Comment</h3>
     {% if user.is_authenticated %}
-      <form method="post">
-        {% csrf_token %}
-        {{ comment_form.as_p }}
-        <button type="submit">Submit</button>
-      </form>
+      <a href="{% url 'comment-create' post.pk %}">Add a Comment</a>
     {% else %}
       <p>You must be <a href="{% url 'login' %}?next={{ request.path }}">logged in</a> to post a comment.</p>
     {% endif %}

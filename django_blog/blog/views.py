@@ -4,7 +4,6 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.views import LoginView, LogoutView
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from django.views.generic.edit import FormMixin
 from .forms import CustomUserCreationForm, CustomUserChangeForm, PostForm, CommentForm
 from .models import Post, Comment
 from django.urls import reverse_lazy, reverse
@@ -64,39 +63,12 @@ class PostListView(ListView):
     context_object_name = 'posts'
     ordering = ['-published_date']
 
-class PostDetailView(FormMixin, DetailView):
+class PostDetailView(DetailView):
     """
-    Displays a single blog post and its comments. 
-    Handles new comment submission for authenticated users.
+    Displays a single blog post and its comments.
     """
     model = Post
     template_name = 'blog/post_detail.html'
-    form_class = CommentForm
-
-    def get_success_url(self):
-        return reverse('post-detail', kwargs={'pk': self.object.pk})
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['comment_form'] = self.get_form()
-        return context
-
-    def post(self, request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            return redirect('login')
-        self.object = self.get_object()
-        form = self.get_form()
-        if form.is_valid():
-            return self.form_valid(form)
-        else:
-            return self.form_invalid(form)
-
-    def form_valid(self, form):
-        comment = form.save(commit=False)
-        comment.post = self.object
-        comment.author = self.request.user
-        comment.save()
-        return super().form_valid(form)
 
 class PostCreateView(LoginRequiredMixin, CreateView):
     """
@@ -137,6 +109,23 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         return self.request.user == post.author
 
 # --- Comment CRUD Views ---
+
+class CommentCreateView(LoginRequiredMixin, CreateView):
+    """
+    Allows an authenticated user to add a comment to a post.
+    """
+    model = Comment
+    form_class = CommentForm
+    template_name = 'blog/comment_form.html'
+
+    def form_valid(self, form):
+        post = get_object_or_404(Post, pk=self.kwargs['post_pk'])
+        form.instance.post = post
+        form.instance.author = self.request.user
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('post-detail', kwargs={'pk': self.kwargs['post_pk']})
 
 class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     """
